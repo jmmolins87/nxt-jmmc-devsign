@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     excerpt: data.excerpt || null,
     content: data.content,
     featured_image: data.featured_image || null,
-    published: data.published ? 1 : 0
+    published: !!data.published
   });
   
   return NextResponse.json({ id, message: 'Article created' });

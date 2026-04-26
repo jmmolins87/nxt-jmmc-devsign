@@ -1,6 +1,7 @@
-import db from './db';
+import fs from 'fs';
+import path from 'path';
 
-export interface Article {
+interface Article {
   id: number;
   slug: string;
   title: string;
@@ -12,44 +13,97 @@ export interface Article {
   updated_at: string;
 }
 
+interface Database {
+  articles: Article[];
+  users: { id: number; username: string; password_hash: string }[];
+}
+
+const dataDir = path.join(process.cwd(), 'data');
+const dbPath = path.join(dataDir, 'portfolio.json');
+
+function readDb(): Database {
+  if (!fs.existsSync(dbPath)) {
+    return { articles: [], users: [] };
+  }
+  return JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+}
+
+function writeDb(data: Database): void {
+  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
+}
+
 export function getPublishedArticles(): Article[] {
-  return db.prepare('SELECT * FROM articles WHERE published = 1 ORDER BY created_at DESC').all() as Article[];
+  const db = readDb();
+  return db.articles
+    .filter(a => a.published)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 }
 
 export function getArticleBySlug(slug: string): Article | undefined {
-  return db.prepare('SELECT * FROM articles WHERE slug = ? AND published = 1').get(slug) as Article | undefined;
+  const db = readDb();
+  return db.articles.find(a => a.slug === slug && a.published);
 }
 
 export function getAllArticles(): Article[] {
-  return db.prepare('SELECT * FROM articles ORDER BY created_at DESC').all() as Article[];
+  const db = readDb();
+  return db.articles.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 }
 
 export function getArticleById(id: number): Article | undefined {
-  return db.prepare('SELECT * FROM articles WHERE id = ?').get(id) as Article | undefined;
+  const db = readDb();
+  return db.articles.find(a => a.id === id);
 }
 
 export function createArticle(article: Omit<Article, 'id' | 'created_at' | 'updated_at'>): number {
-  const stmt = db.prepare(`
-    INSERT INTO articles (slug, title, excerpt, content, featured_image, published)
-    VALUES (@slug, @title, @excerpt, @content, @featured_image, @published)
-  `);
-  const result = stmt.run(article);
-  return result.lastInsertRowid as number;
+  const db = readDb();
+  const maxId = db.articles.length > 0 ? Math.max(...db.articles.map(a => a.id)) : 0;
+  const newId = maxId + 1;
+  const now = new Date().toISOString();
+  
+  db.articles.push({
+    ...article,
+    id: newId,
+    created_at: now,
+    updated_at: now
+  });
+  
+  writeDb(db);
+  return newId;
 }
 
-export function updateArticle(id: number, article: Partial<Article>): void {
-  const fields = Object.keys(article).filter(k => k !== 'id').map(k => `${k} = @${k}`).join(', ');
-  db.prepare(`UPDATE articles SET ${fields}, updated_at = CURRENT_TIMESTAMP WHERE id = @id`).run({ ...article, id });
+export function updateArticle(id: number, update: Partial<Article>): void {
+  const db = readDb();
+  const index = db.articles.findIndex(a => a.id === id);
+  
+  if (index !== -1) {
+    db.articles[index] = {
+      ...db.articles[index],
+      ...update,
+      updated_at: new Date().toISOString()
+    };
+    writeDb(db);
+  }
 }
 
 export function deleteArticle(id: number): void {
-  db.prepare('DELETE FROM articles WHERE id = ?').run(id);
+  const db = readDb();
+  db.articles = db.articles.filter(a => a.id !== id);
+  writeDb(db);
 }
 
 export function createUser(username: string, passwordHash: string): void {
-  db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)').run(username, passwordHash);
+  const db = readDb();
+  if (!db.users.find(u => u.username === username)) {
+    db.users.push({
+      id: db.users.length + 1,
+      username,
+      password_hash: passwordHash
+    });
+    writeDb(db);
+  }
 }
 
 export function getUserByUsername(username: string): { id: number; username: string; password_hash: string } | undefined {
-  return db.prepare('SELECT * FROM users WHERE username = ?').get(username) as any;
+  const db = readDb();
+  return db.users.find(u => u.username === username);
 }
