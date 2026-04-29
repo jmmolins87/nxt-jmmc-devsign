@@ -1,31 +1,40 @@
 export type ParallaxCleanup = () => void;
 
-export function bindParallax(root: ParentNode = document): ParallaxCleanup {
-  if (typeof window === "undefined") {
+export function bindParallax(root?: ParentNode | null): ParallaxCleanup {
+  if (typeof window === "undefined" || !root) {
     return () => undefined;
   }
 
-  const nodes = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-parallax-speed]"),
-  );
-
-  if (nodes.length === 0) {
-    return () => undefined;
-  }
-
+  let nodes: HTMLElement[] = [];
+  const initialTranslate = new Map<HTMLElement, string>();
+  let pending = false;
   let frameId: number | null = null;
   let destroyed = false;
-  const initialTransforms = new Map<HTMLElement, string>();
+  let observer: MutationObserver | null = null;
 
-  for (const el of nodes) {
-    initialTransforms.set(el, el.style.transform);
-  }
+  const collectNodes = () => {
+    nodes = Array.from(root.querySelectorAll<HTMLElement>("[data-parallax-speed]"));
+    for (const el of nodes) {
+      if (!initialTranslate.has(el)) {
+        initialTranslate.set(el, el.style.translate);
+      }
+    }
+  };
+
+  const onScroll = () => {
+    if (destroyed || pending) {
+      return;
+    }
+    pending = true;
+    frameId = window.requestAnimationFrame(update);
+  };
 
   const update = () => {
     if (destroyed) {
       return;
     }
 
+    pending = false;
     const y = window.scrollY;
 
     for (const el of nodes) {
@@ -34,16 +43,30 @@ export function bindParallax(root: ParentNode = document): ParallaxCleanup {
         continue;
       }
 
-      el.style.transform = `translate3d(0, ${Math.round(y * speed)}px, 0)`;
+      el.style.translate = `0 ${Math.round(y * speed)}px`;
     }
-
-    frameId = window.requestAnimationFrame(update);
   };
 
-  frameId = window.requestAnimationFrame(update);
+  collectNodes();
+  if ("MutationObserver" in window) {
+    observer = new MutationObserver(() => {
+      collectNodes();
+      onScroll();
+    });
+    const target = root instanceof Document ? root.body : root;
+    if (target) {
+      observer.observe(target, { childList: true, subtree: true });
+    }
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 
   return () => {
     destroyed = true;
+    window.removeEventListener("scroll", onScroll);
+    observer?.disconnect();
+    observer = null;
 
     if (frameId !== null) {
       window.cancelAnimationFrame(frameId);
@@ -51,13 +74,12 @@ export function bindParallax(root: ParentNode = document): ParallaxCleanup {
     }
 
     for (const el of nodes) {
-      const initialTransform = initialTransforms.get(el);
-      if (initialTransform) {
-        el.style.transform = initialTransform;
-        continue;
+      const initial = initialTranslate.get(el);
+      if (initial) {
+        el.style.translate = initial;
+      } else {
+        el.style.removeProperty("translate");
       }
-
-      el.style.removeProperty("transform");
     }
   };
 }

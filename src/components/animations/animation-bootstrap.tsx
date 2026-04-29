@@ -5,7 +5,7 @@ import { bindParallax } from '@/lib/animation/scroll-parallax';
 
 export function AnimationBootstrap() {
   useEffect(() => {
-    const cleanupParallax = bindParallax();
+    const cleanupParallax = bindParallax(document);
 
     return () => {
       cleanupParallax();
