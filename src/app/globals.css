@@ -129,6 +129,28 @@
   transform: translate3d(0, calc(var(--parallax-front) * -1), 0);
 }
 
+.center-dark-veil {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(
+    62% 46% at 50% 50%,
+    rgba(1, 4, 24, 0.48) 0%,
+    rgba(1, 4, 24, 0.3) 38%,
+    rgba(1, 4, 24, 0) 76%
+  );
+}
+
+[data-theme="light"] .center-dark-veil {
+  background: radial-gradient(
+    62% 46% at 50% 50%,
+    rgba(186, 194, 214, 0.26) 0%,
+    rgba(186, 194, 214, 0.16) 40%,
+    rgba(186, 194, 214, 0) 78%
+  );
+}
+
 .coming-soon-reflection {
   display: inline-block;
   background-image: linear-gradient(110deg, var(--brand-cyan) 0%, var(--brand-blue) 47%, var(--brand-violet) 100%);
