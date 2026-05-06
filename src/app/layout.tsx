@@ -53,9 +53,30 @@ export default function RootLayout({
         root.setAttribute("data-theme", isDay ? "light" : "dark");
       };
 
+      const notice = document.getElementById("geo-theme-notice");
+      const showNotice = () => {
+        if (!notice) return;
+        notice.textContent = "Solicitamos tu ubicación para calcular amanecer/atardecer y activar automáticamente el tema claro u oscuro.";
+        notice.setAttribute("data-open", "true");
+      };
+      const hideNotice = () => {
+        if (!notice) return;
+        notice.setAttribute("data-open", "false");
+      };
+
       const forcedTheme = new URLSearchParams(window.location.search).get("theme");
       if (forcedTheme === "light" || forcedTheme === "dark") {
         root.setAttribute("data-theme", forcedTheme);
+        return;
+      }
+
+      const systemScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      const applySystemTheme = () => {
+        root.setAttribute("data-theme", systemScheme.matches ? "dark" : "light");
+      };
+      if (typeof systemScheme.matches === "boolean") {
+        applySystemTheme();
+        systemScheme.addEventListener("change", applySystemTheme);
         return;
       }
 
@@ -77,9 +98,16 @@ export default function RootLayout({
 
       fallbackByHour();
       if (!("geolocation" in navigator)) return;
+      showNotice();
       navigator.geolocation.getCurrentPosition(
-        (pos) => resolve(pos.coords.latitude, pos.coords.longitude),
-        () => fallbackByHour(),
+        (pos) => {
+          resolve(pos.coords.latitude, pos.coords.longitude);
+          hideNotice();
+        },
+        () => {
+          fallbackByHour();
+          hideNotice();
+        },
         { enableHighAccuracy: false, timeout: 4000, maximumAge: 3600000 }
       );
 
@@ -102,7 +130,10 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <div id="geo-theme-notice" className="geo-theme-notice" aria-live="polite" data-open="false" />
+        {children}
+      </body>
     </html>
   );
 }
