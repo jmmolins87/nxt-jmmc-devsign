@@ -12,15 +12,15 @@ export default function Loader() {
         >
           <defs>
             <linearGradient id="jmmcGradient" x1="28" y1="54" x2="190" y2="166" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#00D5FF" />
-              <stop offset="0.45" stopColor="#3A6DFF" />
-              <stop offset="1" stopColor="#A855F7" />
+              <stop stopColor="var(--brand-cyan)" />
+              <stop offset="0.45" stopColor="var(--brand-blue)" />
+              <stop offset="1" stopColor="var(--brand-violet)" />
             </linearGradient>
 
             <linearGradient id="jmmcPanelGradient" x1="78" y1="68" x2="145" y2="159" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#00D5FF" stopOpacity="0.95" />
-              <stop offset="0.45" stopColor="#2E5BFF" stopOpacity="0.82" />
-              <stop offset="1" stopColor="#A855F7" stopOpacity="0.95" />
+              <stop stopColor="var(--brand-cyan)" stopOpacity="0.95" />
+              <stop offset="0.45" stopColor="var(--brand-blue-deep)" stopOpacity="0.82" />
+              <stop offset="1" stopColor="var(--brand-violet)" stopOpacity="0.95" />
             </linearGradient>
 
             <filter id="jmmcGlow" x="-60%" y="-60%" width="220%" height="220%">
@@ -65,7 +65,6 @@ export default function Loader() {
               className="jmmc-fill-panel"
               d="M83 83L126 62V161L83 145V83Z"
               fill="url(#jmmcPanelGradient)"
-              opacity="0.86"
             />
 
             <path
@@ -86,11 +85,6 @@ export default function Loader() {
           </g>
         </svg>
 
-        <div className="flex items-center gap-1.5 text-4xl md:text-6xl tracking-tight text-white/95 font-light">
-          <span>jmmc</span>
-          <span className="jmmc-dot block h-2.5 w-2.5 self-end rounded-full bg-violet-500 shadow-[0_0_22px_rgba(168,85,247,0.9)] md:h-3.5 md:w-3.5" />
-          <span>devsign</span>
-        </div>
       </div>
 
       <style>{`
@@ -118,6 +112,7 @@ export default function Loader() {
 
         .jmmc-fill-panel {
           transform-origin: 104px 112px;
+          opacity: var(--loader-fill-opacity, .86);
           animation: panelPulse 2.4s cubic-bezier(.76,0,.24,1) infinite;
         }
 
@@ -126,31 +121,39 @@ export default function Loader() {
           animation: shadowPulse 2.4s ease-in-out infinite;
         }
 
-        .jmmc-dot {
-          animation: dotPulse 1.6s ease-in-out infinite;
+        [data-theme="light"] .jmmc-loader {
+          filter: saturate(1.08) contrast(1.04);
+        }
+
+        [data-theme="light"] .jmmc-fill-panel {
+          --loader-fill-opacity: .72;
         }
 
         @keyframes drawStroke {
           0% {
             stroke-dashoffset: 360;
             opacity: .25;
-            filter: drop-shadow(0 0 0 rgba(0, 213, 255, 0));
+            filter: drop-shadow(0 0 0 rgba(var(--brand-cyan-rgb), 0));
           }
           38% {
             stroke-dashoffset: 0;
             opacity: 1;
-            filter: drop-shadow(0 0 14px rgba(0, 213, 255, .75));
+            filter: drop-shadow(0 0 14px rgba(var(--brand-cyan-rgb), .75));
           }
           68% {
             stroke-dashoffset: 0;
             opacity: 1;
-            filter: drop-shadow(0 0 18px rgba(168, 85, 247, .7));
+            filter: drop-shadow(0 0 18px rgba(var(--brand-violet-rgb), .7));
           }
           100% {
             stroke-dashoffset: -360;
             opacity: .35;
-            filter: drop-shadow(0 0 0 rgba(168, 85, 247, 0));
+            filter: drop-shadow(0 0 0 rgba(var(--brand-violet-rgb), 0));
           }
+        }
+
+        [data-theme="light"] .jmmc-stroke {
+          filter: drop-shadow(0 0 10px rgba(var(--brand-blue-rgb), .45));
         }
 
         @keyframes panelPulse {
@@ -183,22 +186,10 @@ export default function Loader() {
           }
         }
 
-        @keyframes dotPulse {
-          0%, 100% {
-            opacity: .55;
-            transform: scale(.82);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.08);
-          }
-        }
-
         @media (prefers-reduced-motion: reduce) {
           .jmmc-stroke,
           .jmmc-fill-panel,
-          .jmmc-shadow,
-          .jmmc-dot {
+          .jmmc-shadow {
             animation: none;
           }
 
