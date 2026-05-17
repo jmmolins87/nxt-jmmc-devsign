@@ -1,0 +1,242 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: oklch(0.637 0.237 25.331);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Temporary lock: keep the whole site in light theme. */
+:root {
+  color-scheme: light;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+.loader-stage {
+  isolation: isolate;
+}
+
+.logo-aura {
+  z-index: 0;
+}
+
+.aura-img {
+  opacity: 0.46;
+}
+
+.logo-aura-light .aura-img {
+  filter:
+    blur(1.5px)
+    drop-shadow(0 0 10px rgb(34 211 238 / 82%))
+    drop-shadow(0 0 28px rgb(34 211 238 / 62%))
+    drop-shadow(0 0 58px rgb(34 211 238 / 42%));
+}
+
+.logo-aura-dark .aura-img {
+  filter:
+    blur(1px)
+    drop-shadow(0 0 14px rgb(236 72 153 / 72%))
+    drop-shadow(0 0 36px rgb(236 72 153 / 52%))
+    drop-shadow(0 0 74px rgb(236 72 153 / 34%));
+}
+
+.logo-cinematic {
+  animation: logoReveal 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.logo-outline-scan {
+  width: 24rem;
+  height: 24rem;
+  z-index: 8;
+  pointer-events: none;
+  opacity: 1;
+  transform: scale(1.035);
+}
+
+.logo-outline-scan::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 286deg,
+    rgb(34 211 238 / 0.25) 308deg,
+    rgb(34 211 238 / 0.95) 334deg,
+    rgb(34 211 238 / 0.2) 352deg,
+    transparent 360deg
+  );
+  animation: outlineSweep 4.8s linear infinite;
+}
+
+.logo-outline-scan-light {
+  -webkit-mask: url("/logos/logo/jmmc_logo_blanco.svg") center / contain no-repeat;
+  mask: url("/logos/logo/jmmc_logo_blanco.svg") center / contain no-repeat;
+  filter:
+    drop-shadow(0 0 10px rgb(34 211 238 / 100%))
+    drop-shadow(0 0 22px rgb(34 211 238 / 95%))
+    drop-shadow(0 0 48px rgb(34 211 238 / 80%));
+}
+
+.logo-outline-scan-dark {
+  -webkit-mask: url("/logos/logo/jmmc_logo_negro.svg") center / contain no-repeat;
+  mask: url("/logos/logo/jmmc_logo_negro.svg") center / contain no-repeat;
+  filter:
+    drop-shadow(0 0 6px rgb(236 72 153 / 90%))
+    drop-shadow(0 0 18px rgb(236 72 153 / 70%))
+    drop-shadow(0 0 38px rgb(236 72 153 / 55%));
+}
+
+.logo-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    rgb(255 255 255 / 55%) 50%,
+    transparent 65%
+  );
+  transform: translateX(-165%) skewX(-18deg);
+  mix-blend-mode: normal;
+  pointer-events: none;
+  animation: hollywoodSweep 2.8s ease-out 0.35s 1 both;
+  z-index: 20;
+}
+
+@keyframes logoReveal {
+  0% {
+    opacity: 0;
+    transform: scale(1.16);
+    filter: blur(14px) brightness(1.45);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.985);
+    filter: blur(1px) brightness(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0) brightness(1);
+  }
+}
+
+@keyframes outlineSweep {
+  0% {
+    transform: rotate(0deg) scale(1.02);
+    opacity: 0.88;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) scale(1.02);
+    opacity: 0.88;
+  }
+}
+
+@keyframes hollywoodSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-165%) skewX(-18deg);
+  }
+  12% {
+    opacity: 0.95;
+  }
+  55% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(185%) skewX(-18deg);
+  }
+}
